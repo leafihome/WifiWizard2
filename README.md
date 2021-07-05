@@ -161,19 +161,42 @@ WifiWizard2.iOSDisconnectNetwork(ssid);
 
 # Android Functions
 
+## WiFi connection Suggestion
+
+Devices running Android 10 (API level 29) and higher allow your app to add network credentials for a device to auto-connect to a Wi-Fi access point. You can supply suggestions for which network to connect to using WifiNetworkSuggestion. [More details](https://developer.android.com/guide/topics/connectivity/wifi-suggest)
+
+You must use this function to connect to a wifi if you want internet access on all your device (API 29 or higher).
+
+```javascript
+WifiWizard2.suggestConnection(ssid, password, algorithm, isHiddenSSID);
+```
+
+- `ssid` can either be an SSID (string)
+- `password` ASCII password (string)
+- `alghorithm` by default is (WPA) you can parse (string) "WPA, WPA2, WPA3"
+- `isHiddenSSID` boolean determine if is hidden or not
+- return boolean, true or false, when is connected or user press cancel on request modal.
+
+**Thrown Errors**
+
+- `SUGGESTION_INVALID_DATA` Invalid data format
+- `STATUS_NETWORK_SUGGESTIONS_ERROR` Android returned error when network can not be suggested
+- `SUGGESTION_INVALID_API_VERSION` Android this function is accesible only form Api version 29 or higher
+
 ## WiFi connection Specifier
 
 Android 10 Api >= 29 Specifier connection. Native Ui show modal for connect one device to your Phone.
 You can select one network or cancel operation.
 Tested success on Samsung SM-N960F and Redmi 7
+This function doesn't provide access to the internet outside your app. See Wifi connection Suggestion
 
 ```javascript
-WifiWizard2.specifierConnection(sid, password, alhorithm, isHiddenSSID);
+WifiWizard2.specifierConnection(ssid, password, algorithm, isHiddenSSID);
 ```
 
 - `ssid` can either be an SSID (string)
 - `password` ASCII password (string)
-- `alhorithm` by default is (WPA) you can parse (string) "WPA, WPA2, WPA3"
+- `alghorithm` by default is (WPA) you can parse (string) "WPA, WPA2, WPA3"
 - `isHiddenSSID` boolean determine if is hidden or not
 - return boolean, true or false, when is connected or user press cancel on request modal.
 
@@ -183,9 +206,11 @@ WifiWizard2.specifierConnection(sid, password, alhorithm, isHiddenSSID);
 - `SPECIFIER_NETWORK_UNAVAILABLE` Android returned error when network is not accessible
 - `SPECIFIER_INVALID_API_VERSION` Android this function is accesible form Api version 29
 
-- **WifiWizard2** _will automagically try to enable WiFi if it's disabled when calling any android related methods that require WiFi to be enabled_
+**WifiWizard2** _will automagically try to enable WiFi if it's disabled when calling any android related methods that require WiFi to be enabled_
 
 ## Connect vs Enable
+
+:warning: WARNING: API 28 or lower.
 
 When writing Android Java code, there is no `connect` methods, you basically either `enable` or `disable` a network. In the original versions of WifiWizard the `connect` method would basically just call `enable` in Android.
 I have changed the way this works in WifiWizard2 version 3.0.0+, converting it to a helper method to eliminate having to call `formatWifiConfig` then `add` and then `enable` ... the `connect` method will now automatically call `formatWifiConfig`, then call `add` to either add or update the network configuration, and then call `enable`.
@@ -350,10 +375,19 @@ WifiWizard2.getConnectedNetworkID();
 
 - `GET_CONNECTED_NET_ID_ERROR` Unable to determine currently connected network ID (may not be connected)
 
+## New to 3.3.0+
+
+```javascript
+WifiWizard2.suggestConnection(ssid, password, algorithm, isHiddenSSID);
+```
+
+- Android 10 Api >= 29 Suggestion connection. [More details](https://developer.android.com/guide/topics/connectivity/wifi-suggest)
+
+
 ## New to 3.2.0+
 
 ```javascript
-WifiWizard2.specifierConnection(sid, password, alhorithm, isHiddenSSID);
+WifiWizard2.specifierConnection(ssid, password, algorithm, isHiddenSSID);
 ```
 
 - Android 10 Api >= 29 Specifier connection.
@@ -531,6 +565,10 @@ WifiWizard2.enable(ssid, bindAll, waitForConnection);
 
 # Installation
 
+## 3.3.0
+
+Run `cordova plugin add https://github.com/matscav/WifiWizard2#dev`
+
 ## Master
 
 Run `cordova plugin add https://github.com/tripflex/WiFiWizard2`
@@ -597,6 +635,11 @@ wifiConnection.then((result) => {
 Apache 2.0
 
 # Changelog:
+
+**3.3.0** - TBD
+
+- Added suggest connection method `suggestConnection()`
+- Typo fixes
 
 **3.2.0** - TBD
 
