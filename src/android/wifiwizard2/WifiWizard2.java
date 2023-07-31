@@ -44,6 +44,7 @@ import android.net.wifi.SupplicantState;
 import android.net.ConnectivityManager;
 
 import android.location.LocationManager;
+import android.os.Handler;
 import android.provider.Settings;
 
 import android.content.Context;
@@ -893,13 +894,37 @@ public class WifiWizard2 extends CordovaPlugin {
     private boolean disconnect(CallbackContext callbackContext) {
         Log.d(TAG, "WifiWizard2: disconnect entered.");
 
-        if (wifiManager.disconnect()) {
-            maybeResetBindALL();
-            callbackContext.success("Disconnected from current network");
-            return true;
+        if (API_VERSION >= 29) {
+            if (networkCallback == null) {
+                Log.e(TAG, "networkCallback missing, can't disconnect");
+                return false;
+            }
+            try {
+                ConnectivityManager cm = (ConnectivityManager)
+                        cordova.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+                cm.unregisterNetworkCallback(networkCallback);
+
+                Handler newHandler = new Handler();
+                newHandler.postDelayed(() -> {
+                    Network network1 = cm.getActiveNetwork();
+                    cm.bindProcessToNetwork(network1);
+                    callbackContext.success("Disconnected from current network");
+                }, 4000);
+                return true;
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+                callbackContext.error("Error with disconnecting");
+                return false;
+            }
         } else {
-            callbackContext.error("ERROR_DISCONNECT");
-            return false;
+            if (wifiManager.disconnect()) {
+                maybeResetBindALL();
+                callbackContext.success("Disconnected from current network");
+                return true;
+            } else {
+                callbackContext.error("ERROR_DISCONNECT");
+                return false;
+            }
         }
     }
 
