@@ -2069,7 +2069,7 @@ public class WifiWizard2 extends CordovaPlugin {
                 NetworkRequest networkRequest = networkRequestBuilder1.build();
                 ConnectivityManager cm = (ConnectivityManager)
                         cordova.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-                ConnectivityManager.NetworkCallback networkCallback = new
+                networkCallback = new
                         ConnectivityManager.NetworkCallback() {
                             @Override
                             public void onAvailable(Network network) {
