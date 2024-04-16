@@ -906,8 +906,7 @@ public class WifiWizard2 extends CordovaPlugin {
 
                 Handler newHandler = new Handler();
                 newHandler.postDelayed(() -> {
-                    Network network1 = cm.getActiveNetwork();
-                    cm.bindProcessToNetwork(network1);
+                    cm.bindProcessToNetwork(null);
                     callbackContext.success("Disconnected from current network");
                 }, 4000);
                 return true;
